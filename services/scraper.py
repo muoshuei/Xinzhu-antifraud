@@ -26,3 +26,13 @@ def get_104_job_data(url: str):
     except Exception as e:
         print(f"Scraping Error: {e}")
         return None
+    
+if __name__ == "__main__":
+    url = "https://www.104.com.tw/job/8msz8"
+
+    import json
+    data = get_104_job_data(url)
+    json_str = json.dumps(data)
+    with open("data.json", "w") as f:
+        f.write(json_str)
+        
