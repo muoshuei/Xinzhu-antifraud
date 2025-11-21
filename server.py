@@ -28,10 +28,10 @@ def handle_message(event):
     user_text = event.message.text.strip()
 
     # 路由邏輯
-    if user_text.startswith("/scan"):
+    if user_text.startswith("https://www.104.com.tw/job/"):
         parts = user_text.split(maxsplit=1)
         if len(parts) < 2:
-            reply = TextSendMessage(text="請輸入正確格式：/scan [104職缺連結]")
+            reply = TextSendMessage(text="請輸入正確格式：https://www.104.com.tw/job/*****")
             line_bot_api.reply_message(event.reply_token, reply)
             return
 
