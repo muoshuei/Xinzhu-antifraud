@@ -1,3 +1,4 @@
+import re
 from fastapi import FastAPI, Request, HTTPException
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
@@ -27,36 +28,35 @@ async def webhook(request: Request):
 def handle_message(event):
     user_text = event.message.text.strip()
 
-    # 路由邏輯
-    if user_text.startswith("https://www.104.com.tw/job/"):
-        parts = user_text.split(maxsplit=1)
-        if len(parts) < 2:
-            reply = TextSendMessage(text="請輸入正確格式：https://www.104.com.tw/job/*****")
-            line_bot_api.reply_message(event.reply_token, reply)
-            return
+    # 定義 104 職缺連結的特徵 (Regex)
+    # https?://  -> http 或 https 開頭
+    # (?:www\.)? -> 可能有 www. 也可能沒有
+    # 104\.com\.tw/job/ -> 網域與路徑
+    # [a-zA-Z0-9]+ -> 職缺代碼 (英數字組合)
+    url_pattern = r'https?://(?:www\.)?104\.com\.tw/job/[a-zA-Z0-9]+'
+    
+    match = re.search(url_pattern, user_text)
 
-        url = parts[1]
-        
-        # 步驟 1: 獲取資料 (Scraper)
-        job_data = get_104_job_data(url)
+    if match:
+        target_url = match.group(0)
+
+        job_data = get_104_job_data(target_url)
         
         if not job_data:
              reply = TextSendMessage(text="❌ 無法讀取職缺資料，請確認連結是否為 104 有效職缺。")
              line_bot_api.reply_message(event.reply_token, reply)
              return
 
-        # 步驟 2: 分析風險 (Analyzer)
         risk_result = analyze_risk(job_data)
         
-        # 步驟 3: 產生 UI (Renderer)
         flex_message = create_risk_flex_message(risk_result)
         
-        # 步驟 4: 回覆 (Bot API)
         line_bot_api.reply_message(event.reply_token, flex_message)
 
     else:
-        # 其他訊息處理
-        pass
+        # 選項 B: 引導使用者 (適合一對一)
+        reply_text = "請貼上 104 職缺連結 (例如: https://www.104.com.tw/job/xxxxx)，我會幫您分析風險。"
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
 
 if __name__ == "__main__":
     import uvicorn
