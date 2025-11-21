@@ -24,26 +24,19 @@ async def webhook(request: Request):
         raise HTTPException(status_code=400, detail="Invalid signature")
     return "OK"
 
-@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_text = event.message.text.strip()
 
-    # 定義 104 職缺連結的特徵 (Regex)
-    # https?://  -> http 或 https 開頭
-    # (?:www\.)? -> 可能有 www. 也可能沒有
-    # 104\.com\.tw/job/ -> 網域與路徑
-    # [a-zA-Z0-9]+ -> 職缺代碼 (英數字組合)
-    url_pattern = r'https?://(?:www\.)?104\.com\.tw/job/[a-zA-Z0-9]+'
+    url_pattern = r'https?://www\.104\.com\.tw/job/[a-zA-Z0-9]+'
     
     match = re.search(url_pattern, user_text)
 
     if match:
         target_url = match.group(0)
-
         job_data = get_104_job_data(target_url)
         
         if not job_data:
-             reply = TextSendMessage(text="❌ 無法讀取職缺資料，請確認連結是否為 104 有效職缺。")
+             reply = TextSendMessage(text="❌ 無法讀取職缺資料，請確認該職缺是否已下架。")
              line_bot_api.reply_message(event.reply_token, reply)
              return
 
