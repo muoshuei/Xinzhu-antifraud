@@ -24,6 +24,7 @@ async def webhook(request: Request):
         raise HTTPException(status_code=400, detail="Invalid signature")
     return "OK"
 
+@handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_text = event.message.text.strip()
 
