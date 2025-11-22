@@ -1,7 +1,7 @@
 import os
 from google.cloud import storage
 
-def download_from_gcs(bucket_name, gcs_path, local_path):
+def download_from_gcs(bucket_name, gcs_path, local_path="tmp/model"):
     """
     從 GCS 下載單個檔案到本地
     """

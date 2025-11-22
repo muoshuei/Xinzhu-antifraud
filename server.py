@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import re
 from fastapi import FastAPI, Request, HTTPException
 from linebot.exceptions import InvalidSignatureError
@@ -5,10 +6,28 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 from config import line_bot_api, handler
 from services.scraper import get_104_job_data
-from services.analyzer import analyze_risk
-from services.ui_renderer import create_risk_flex_message
 
+from services.ui_renderer import create_risk_flex_message
+from utils import download_multiple
+from predict.predict import FraudPredictor
+from typing import cast
 app = FastAPI(title="Job Scam Detector")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 下載模型 & scaler
+    BUCKET = "muoshuei-bucket"
+    FILES = ["model/fraud_detection_model.pth", "model/scaler.pkl"]
+    model_path = download_multiple(BUCKET, FILES)
+
+    # 初始化 FraudPredictor
+    app.state.predictor = FraudPredictor(model_path="tmp/fraud_detection_model.pth", scaler_path="tmp/scaler.pkl")
+    
+    yield  # app 進入運行階段
+    
+    # shutdown 可釋放資源
+    del app.state.predictor
+    print("Predictor resources cleaned up.")
 
 @app.get("/")
 async def root():
@@ -36,15 +55,32 @@ def handle_message(event):
         target_url = match.group(0)
         job_data = get_104_job_data(target_url)
         
+        #TODO threads
+
         if not job_data:
              reply = TextSendMessage(text="❌ 無法讀取職缺資料，請確認該職缺是否已下架。")
              line_bot_api.reply_message(event.reply_token, reply)
              return
 
-        risk_result = analyze_risk(job_data)
-        
+        # risk_result = analyze_risk(job_data)
+        predictor = cast(FraudPredictor, app.state.predictor)
+
+        sample_data = {
+            'full_content': '急徵在家工作人員，日領薪水，加LINE ID: scam123',
+            'salary_min': 50000,
+            'salary_max': 100000,
+            'salary_type': 1,
+            'capital_amount_cleaned': 0,
+            'employees_cleaned': 0,
+            '供需人數 (應徵人數) (Number of Applicants)': 10,
+            '縣市 (City/County)': 1,
+            '工作經歷 (Work Experience)': 0,
+            '學歷要求 (Educational Requirements)': 0
+        }
+        risk_result = predictor.predict(sample_data)
+
         flex_message = create_risk_flex_message(risk_result)
-        
+
         line_bot_api.reply_message(event.reply_token, flex_message)
 
     else:
