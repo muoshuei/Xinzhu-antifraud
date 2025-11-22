@@ -12,6 +12,11 @@ from services.ui_renderer import create_risk_flex_message
 from services.ui_renderer import create_risk_flex_message
 from utils import download_multiple
 from typing import cast
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app = FastAPI(title="Job Scam Detector")
 
 @asynccontextmanager
@@ -19,16 +24,17 @@ async def lifespan(app: FastAPI):
     # 下載模型 & scaler
     BUCKET = "muoshuei-bucket"
     FILES = ["model/fraud_detection_model.pth", "model/scaler.pkl"]
-    model_path = download_multiple(BUCKET, FILES)
+    model_paths = download_multiple(BUCKET, FILES)
 
     # 初始化 FraudPredictor
     app.state.predictor = FraudPredictor(model_path="tmp/model/fraud_detection_model.pth", scaler_path="tmp/model/scaler.pkl")
-    
+    logger.info("Init predictor")
     yield  # app 進入運行階段
     
     # shutdown 可釋放資源
     del app.state.predictor
     print("Predictor resources cleaned up.")
+    logger.info("Terminated")
 
 @app.get("/")
 async def root():
@@ -53,7 +59,9 @@ def handle_message(event):
     match = re.search(url_pattern, user_text)
 
     if match:
+        
         target_url = match.group(0)
+        logger.info(f"Searching job info for target_url: {target_url}")
         job_data = process_job_url(target_url)
         
         #TODO threads
@@ -62,7 +70,7 @@ def handle_message(event):
              reply = TextSendMessage(text="❌ 無法讀取職缺資料，請確認該職缺是否已下架。")
              line_bot_api.reply_message(event.reply_token, reply)
              return
-
+        logger.info(f"Got job data for {target_url}")
         # risk_result = analyze_risk(job_data)
         predictor = cast(FraudPredictor, app.state.predictor)
 
