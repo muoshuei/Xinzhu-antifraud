@@ -43,15 +43,15 @@ def analyze_risk(job_data: dict):
     # 判定等級
     if score >= 60:
         level = "danger"
-        title = f"高風險 (High Risk)"
+        title = f"{score}高風險 (High Risk)"
         color = "#FF3333"
     elif score >= 30:
         level = "warning"
-        title = f"需謹慎 (Caution)"
+        title = f"{score}需謹慎 (Caution)"
         color = "#FFAA33"
     else:
         level = "safe"
-        title = f"低風險 (Safe)"
+        title = f"{score}低風險 (Safe)"
         color = "#33AA33"
 
     if not reasons:
@@ -66,3 +66,11 @@ def analyze_risk(job_data: dict):
         "job_name": header.get('jobName', '未知職缺'),
         "company": header.get('custName', '未知公司')
     }
+
+if __name__ == "__main__":
+    import json
+    with open('data.json', 'r') as f:
+        sample_data = json.load(f)
+    
+    res = analyze_risk(sample_data)
+    print(res)
