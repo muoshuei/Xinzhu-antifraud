@@ -43,15 +43,15 @@ def analyze_risk(job_data: dict):
     # 判定等級
     if score >= 60:
         level = "danger"
-        title = f"{score}高風險 (High Risk)"
+        title = f"高風險 (High Risk)"
         color = "#FF3333"
     elif score >= 30:
         level = "warning"
-        title = f"{score}需謹慎 (Caution)"
+        title = f"需謹慎 (Caution)"
         color = "#FFAA33"
     else:
         level = "safe"
-        title = f"{score}低風險 (Safe)"
+        title = f"低風險 (Safe)"
         color = "#33AA33"
 
     if not reasons:
