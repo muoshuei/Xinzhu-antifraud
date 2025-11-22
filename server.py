@@ -1,13 +1,13 @@
 import re
 from fastapi import FastAPI, Request, HTTPException
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, FlexSendMessage
 
 from config import line_bot_api, handler
 from services.process_job_link import process_job_url
 from services.predict import FraudPredictor
-from services.ui_renderer import create_risk_flex_message
 from services.gemini_explain_risk import get_job_fraud_analysis
+from services.message_builder import create_fraud_check_flex
 
 app = FastAPI(title="Job Scam Detector")
 
@@ -42,8 +42,7 @@ def handle_message(event):
              line_bot_api.reply_message(event.reply_token, reply)
              return
 
-        gemini_job_fraud_caption = get_job_fraud_analysis(job_data.head(1)) 
-        print(gemini_job_fraud_caption)
+        gemini_text = get_job_fraud_analysis(job_data.head(1)) 
 
         predictor = FraudPredictor()
         predict_risk = predictor.predict_csv(job_data)
@@ -51,11 +50,20 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_string))
         print("Prediction Result:")
         print(predict_risk)
+
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=gemini_text))
+
+        flex_payload = create_fraud_check_flex(predict_risk, gemini_text)
         
-        # flex_message = create_risk_flex_message(predict_risk) # 還要重新設計
         
-        # line_bot_api.reply_message(event.reply_token, flex_message)
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=gemini_job_fraud_caption))
+        if flex_payload:
+            line_bot_api.reply_message(
+                event.reply_token,
+                FlexSendMessage(
+                    alt_text=flex_payload["altText"],
+                    contents=flex_payload["contents"]
+                )
+            )
 
     else:
         # 選項 B: 引導使用者 (適合一對一)
