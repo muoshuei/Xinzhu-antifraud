@@ -66,7 +66,7 @@ def handle_message(event):
         
         #TODO threads
 
-        if not job_data:
+        if job_data.empty:
              reply = TextSendMessage(text="❌ 無法讀取職缺資料，請確認該職缺是否已下架。")
              line_bot_api.reply_message(event.reply_token, reply)
              return
@@ -74,23 +74,14 @@ def handle_message(event):
         # risk_result = analyze_risk(job_data)
         predictor = cast(FraudPredictor, app.state.predictor)
 
-        sample_data = {
-            'full_content': '急徵在家工作人員，日領薪水，加LINE ID: scam123',
-            'salary_min': 50000,
-            'salary_max': 100000,
-            'salary_type': 1,
-            'capital_amount_cleaned': 0,
-            'employees_cleaned': 0,
-            '供需人數 (應徵人數) (Number of Applicants)': 10,
-            '縣市 (City/County)': 1,
-            '工作經歷 (Work Experience)': 0,
-            '學歷要求 (Educational Requirements)': 0
-        }
-        risk_result = predictor.predict(sample_data)
+        predict_risk = predictor.predict_csv(job_data)
+        reply_string = TextSendMessage(text="predict_risk")
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_string))
+        print("Prediction Result:")
+        print(predict_risk)
+        # flex_message = create_risk_flex_message(risk_result)
 
-        flex_message = create_risk_flex_message(risk_result)
-
-        line_bot_api.reply_message(event.reply_token, flex_message)
+        # line_bot_api.reply_message(event.reply_token, flex_message)
 
     else:
         # 選項 B: 引導使用者 (適合一對一)
