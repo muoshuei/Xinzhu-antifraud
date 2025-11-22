@@ -10,8 +10,8 @@ import json
 import argparse
 
 # 設定參數
-MODEL_PATH = './model/fraud_detection_model.pth'
-SCALER_PATH = './services/scaler.pkl'
+MODEL_PATH = './tmp/model/fraud_detection_model.pth'
+SCALER_PATH = './tmp/model/scaler.pkl'
 MAPPING_PATH = './services/category_mappings.json'
 MAX_LEN = 256
 
