@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 下載模型 & scaler
-    BUCKET = "muoshuei-bucket"
+    BUCKET = "hsinchu-hackerthon-storage"
     FILES = ["model/fraud_detection_model.pth", "model/scaler.pkl"]
     model_paths = download_multiple(BUCKET, FILES)
 
