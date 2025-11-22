@@ -66,3 +66,11 @@ def analyze_risk(job_data: dict):
         "job_name": header.get('jobName', '未知職缺'),
         "company": header.get('custName', '未知公司')
     }
+
+if __name__ == "__main__":
+    import json
+    with open('data.json', 'r') as f:
+        sample_data = json.load(f)
+    
+    res = analyze_risk(sample_data)
+    print(res)
