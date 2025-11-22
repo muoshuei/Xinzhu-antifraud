@@ -257,7 +257,8 @@ def get_mappings_from_dataset():
 # Main Pipeline
 # ==============================
 
-def process_job_url(job_url, output_path='processed_job.csv'):
+# def process_job_url(job_url, output_path='processed_job.csv'):
+def process_job_url(job_url):
     print(f"Processing URL: {job_url}")
     
     # 1. Crawl
@@ -374,15 +375,16 @@ def process_job_url(job_url, output_path='processed_job.csv'):
     print(df_final.iloc[0])
     print("-" * 30)
     
-    print(f"Saving to {output_path}...")
-    df_final.to_csv(output_path, index=False)
+    # print(f"Saving to {output_path}...")
+    # df_final.to_csv(output_path, index=False)
     print("Done!")
     return df_final
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process 104 Job Link and convert to model-ready format.")
     parser.add_argument("url", help="The 104 Job URL (e.g., https://www.104.com.tw/job/8v3a2)")
-    parser.add_argument("--output", default="processed_job.csv", help="Output CSV path (default: processed_job.csv)")
+    # parser.add_argument("--output", default="processed_job.csv", help="Output CSV path (default: processed_job.csv)")
     
     args = parser.parse_args()
-    process_job_url(args.url, args.output)
+    # process_job_url(args.url, args.output)
+    process_job_url(args.url)

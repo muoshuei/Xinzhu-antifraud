@@ -151,7 +151,8 @@ class FraudPredictor:
             'risk_level': 'High' if score > 0.8 else 'Medium' if score > 0.5 else 'Low'
         }
     
-    def predict_csv(self, input_df, output_path='predictions.csv'):
+    # def predict_csv(self, input_df, output_path='predictions.csv'):
+    def predict_csv(self, input_df):
         """
         接收 DataFrame，轉換類別欄位後進行預測
         """
@@ -191,8 +192,8 @@ class FraudPredictor:
         final_df = pd.concat([input_df.reset_index(drop=True), results_df], axis=1)
         
         # 儲存結果
-        final_df.to_csv(output_path, index=False, encoding='utf-8-sig')
-        print(f"Prediction complete. Results saved to '{output_path}'")
+        # final_df.to_csv(output_path, index=False, encoding='utf-8-sig')
+        # print(f"Prediction complete. Results saved to '{output_path}'")
         return final_df
 
 # 測試區塊
@@ -215,7 +216,8 @@ if __name__ == "__main__":
 
     try:
         predictor = FraudPredictor()
-        predictor.predict_csv(test_df, 'test_output.csv')
+        # predictor.predict_csv(test_df, 'test_output.csv')
+        predictor.predict_csv(test_df)
     except Exception as e:
         print(f"Initialization failed: {e}")
         print("Ensure 'category_mappings.json', 'scaler.pkl', and model file exist.")
