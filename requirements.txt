@@ -1,3 +1,9 @@
 fastapi
 uvicorn[standard]
 line-bot-sdk
+torch
+transformers
+pandas
+numpy
+scikit-learn
+joblib
