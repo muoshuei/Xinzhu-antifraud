@@ -1,4 +1,7 @@
 venv
 __pycache__
 .env
+.env.*
 data.json
+model
+test.py
