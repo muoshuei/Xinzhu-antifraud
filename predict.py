@@ -85,6 +85,20 @@ class FraudPredictor:
         return full_content, torch.tensor(features_scaled, dtype=torch.float)
 
     def predict(self, data_dict):
+        """
+        sample_data = {
+            'full_content': '急徵在家工作人員，日領薪水，加LINE ID: scam123',
+            'salary_min': 50000,
+            'salary_max': 100000,
+            'salary_type': 1,
+            'capital_amount_cleaned': 0,
+            'employees_cleaned': 0,
+            '供需人數 (應徵人數) (Number of Applicants)': 10,
+            '縣市 (City/County)': 1,
+            '工作經歷 (Work Experience)': 0,
+            '學歷要求 (Educational Requirements)': 0
+        }
+        """
         text, tabular_tensor = self.preprocess_input(data_dict)
         
         encoding = self.tokenizer.encode_plus(
