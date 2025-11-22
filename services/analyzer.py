@@ -19,7 +19,7 @@ def analyze_risk(job_data: dict):
     contact_info = contact.get('hrContact', '')
     
     # --- 風險規則 ---
-    risk_keywords = ['輕鬆', '免經驗', '高薪', '在家工作', '博弈', '轉帳', '只要手機', '加瀨']
+    risk_keywords = ['輕鬆', '免經驗', '高薪', '在家工作', '博弈', '轉帳', '只要手機', '福利']
     found_keywords = [kw for kw in risk_keywords if kw in job_desc]
     
     if found_keywords:
