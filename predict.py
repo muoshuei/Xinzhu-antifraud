@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 import numpy as np
 from transformers.models.bert.tokenization_bert import BertTokenizer
-from predict.hybrid_model import HybridBertModel
+from hybrid_model import HybridBertModel
 import re
 
 # 設定參數
