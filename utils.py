@@ -1,5 +1,9 @@
 import os
 from google.cloud import storage
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def download_from_gcs(bucket_name, gcs_path, local_path="tmp/model"):
     """
@@ -11,6 +15,7 @@ def download_from_gcs(bucket_name, gcs_path, local_path="tmp/model"):
     blob = bucket.blob(gcs_path)
     blob.download_to_filename(local_path)
     print(f"Downloaded {gcs_path} to {local_path}")
+    logger.info(f"Downloaded {gcs_path} to {local_path}")
 
 def download_multiple(bucket_name, file_list, local_dir="/tmp/model"):
     """
