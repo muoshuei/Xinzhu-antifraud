@@ -17,7 +17,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Job Scam Detector")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,6 +35,8 @@ async def lifespan(app: FastAPI):
     del app.state.predictor
     print("Predictor resources cleaned up.")
     logger.info("Terminated")
+    
+app = FastAPI(title="Job Scam Detector", lifespan=lifespan)
 
 @app.get("/")
 async def root():
