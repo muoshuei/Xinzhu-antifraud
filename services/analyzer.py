@@ -39,7 +39,7 @@ def analyze_risk(job_data: dict):
     if "面議" in salary and "兼職" in header.get('jobName', ''):
         score += 20
         reasons.append("兼職工作卻薪資面議")
-
+    score = 80
     # 判定等級
     if score >= 60:
         level = "danger"
