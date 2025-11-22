@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     model_path = download_multiple(BUCKET, FILES)
 
     # 初始化 FraudPredictor
-    app.state.predictor = FraudPredictor(model_path="tmp/fraud_detection_model.pth", scaler_path="tmp/scaler.pkl")
+    app.state.predictor = FraudPredictor(model_path="tmp/model/fraud_detection_model.pth", scaler_path="tmp/model/scaler.pkl")
     
     yield  # app 進入運行階段
     
