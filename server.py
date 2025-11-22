@@ -7,6 +7,7 @@ from config import line_bot_api, handler
 from services.process_job_link import process_job_url
 from services.predict import FraudPredictor
 from services.ui_renderer import create_risk_flex_message
+from services.gemini_explain_risk import get_job_fraud_analysis
 
 app = FastAPI(title="Job Scam Detector")
 
@@ -41,6 +42,9 @@ def handle_message(event):
              line_bot_api.reply_message(event.reply_token, reply)
              return
 
+        gemini_job_fraud_caption = get_job_fraud_analysis(job_data.head(1)) 
+        print(gemini_job_fraud_caption)
+
         predictor = FraudPredictor()
         predict_risk = predictor.predict_csv(job_data)
         reply_string = TextSendMessage(text="predict_risk")
@@ -51,6 +55,7 @@ def handle_message(event):
         # flex_message = create_risk_flex_message(predict_risk) # 還要重新設計
         
         # line_bot_api.reply_message(event.reply_token, flex_message)
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=gemini_job_fraud_caption))
 
     else:
         # 選項 B: 引導使用者 (適合一對一)
