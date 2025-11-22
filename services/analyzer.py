@@ -19,9 +19,15 @@ def analyze_risk(job_data: dict):
     contact_info = contact.get('hrContact', '')
     
     # --- 風險規則 ---
-    risk_keywords = ['輕鬆', '免經驗', '高薪', '在家工作', '博弈', '轉帳', '只要手機', '福利']
+    risk_keywords = ['輕鬆', '免經驗', '高薪', '在家工作', '博弈', '轉帳', '只要手機', '福利', '一般']
     found_keywords = [kw for kw in risk_keywords if kw in job_desc]
     
+    if found_keywords:
+        score += 30
+        reasons.append(f"包含高風險關鍵字: {', '.join(found_keywords)}")
+    if found_keywords:
+        score += 30
+        reasons.append(f"包含高風險關鍵字: {', '.join(found_keywords)}")
     if found_keywords:
         score += 30
         reasons.append(f"包含高風險關鍵字: {', '.join(found_keywords)}")
@@ -37,15 +43,15 @@ def analyze_risk(job_data: dict):
     # 判定等級
     if score >= 60:
         level = "danger"
-        title = "高風險 (High Risk)"
+        title = f"{score}高風險 (High Risk)"
         color = "#FF3333"
     elif score >= 30:
         level = "warning"
-        title = "需謹慎 (Caution)"
+        title = f"{score}需謹慎 (Caution)"
         color = "#FFAA33"
     else:
         level = "safe"
-        title = "低風險 (Safe)"
+        title = f"{score}低風險 (Safe)"
         color = "#33AA33"
 
     if not reasons:
